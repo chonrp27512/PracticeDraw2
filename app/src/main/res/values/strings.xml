@@ -16,4 +16,5 @@
     <string name="title_mask_filter">setMaskFilter()</string>
     <string name="title_fill_path">setFillPath()</string>
     <string name="title_text_path">setTextPath()</string>
+    <string name="title_PathEffect2">setPathEffect()-2</string>
 </resources>
