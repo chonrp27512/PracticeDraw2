@@ -1,13 +1,22 @@
 package com.hencoder.hencoderpracticedraw2;
 
+import android.app.AppOpsManager;
+import android.app.Notification;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.AppOpsManagerCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 
 import java.util.ArrayList;
@@ -37,10 +46,25 @@ public class MainActivity extends AppCompatActivity {
         pageModels.add(new PageModel(R.layout.sample_text_path, R.string.title_text_path, R.layout.practice_text_path));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        NotificationManagerCompat from = NotificationManagerCompat.from(this);
+
+        NotificationCompat.Builder notificationCompat=new NotificationCompat.Builder(this).setSmallIcon(R.drawable.batman)
+                .setContentTitle("我的标题")
+                .setAutoCancel(true);
+
+        from.notify(1,notificationCompat.build());
+
+        boolean isEnabled = from.areNotificationsEnabled();
+
+        Log.i("regan","通知栏的推送开关for："+isEnabled);
+
+        AppOpsManager systemService = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
 
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
