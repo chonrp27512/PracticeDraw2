@@ -93,23 +93,23 @@
 		2，混合（Blending）
 		{
 		第一类：Alpha
-			SRC         只能看到源图
-			SRC_OVER    源图在上，目标图在下
-			SRC_IN      源图和目标图相交的区域
-			SRC_ATOP
-			DST
-			DST_OVER
-			DST_IN
-			DST_ATOP
-			CLEAR
-			SRC_OUT
-			DST_OUT
-			XOR
+			CLEAR       所绘制源图像不会提交到画布上。
+			SRC         只显示源图像。
+			SRC_OVER    正常绘制显示，源图像居上显示。
+			SRC_IN      取两层绘制交集中的源图像。
+			SRC_ATOP    在源图像和目标图像相交的地方绘制源图像，在不相交的地方绘制目标图像。
+			SRC_OUT     只在源图像和目标图像不相交的地方绘制源图像。
+			DST         只显示目标图像。
+			DST_OVER    上下层都显示。目标图像居上显示。
+			DST_IN      取两层绘制交集中的目标图像。
+			DST_ATOP    在源图像和目标图像相交的地方绘制目标图像而在不相交的地方绘制源图像。
+			DST_OUT     只在源图像和目标图像不相交的地方绘制目标图像。
+			XOR          异或：去除两图层交集部分
 		第二类：混合
-			DARKEN
-			LIGHTEN
-			MULTIPLY
-			SCREEN
+			DARKEN      取两图层全部区域，交集部分颜色加深
+			LIGHTEN     取两图层全部，点亮交集部分颜色
+			MULTIPLY    取两图层交集部分叠加后颜色
+			SCREEN      滤色。
 			OVERLAY
 		}
 
@@ -128,15 +128,18 @@ Alpha通道合成类型  透明度计算
 		1，LightingColorFilter
 		2，ProterDuffColorFilter
 		3，ColorMatrixColorFilter
+	
 
 ####1.2.1 LightingColorFilter 模拟光照效果
 
 	构造参数：	
 		mul & add ：颜色值 mul用来和目标像素相乘；add用来和目标像素相加。
 
+	算法：
 		R' = R * mul.R / 0xff + add.R
 		G' = G * mul.G / 0xff + add.G
 		B' = B * mul.B / 0xff + add.B
+	Alpha通道A是忽略的，所以随便设置什么都不会有变化的
 
 ####1.2.2 PorterDuffColorFilter 使用一个指定的颜色和一种指定的PorduffModel来与绘制对象合成
 	
@@ -252,5 +255,6 @@ Android中Canvas绘图之PorterDuffXfermode使用及工作原理详解：
 	paint.setFilterBitmap(boolean)
 
 #####2.4.1 
+	
 
 
