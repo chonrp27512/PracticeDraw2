@@ -248,13 +248,156 @@ Android中Canvas绘图之PorterDuffXfermode使用及工作原理详解：
 		BUTT平头、ROUND圆头、SQUARE方头
 	3，setStrokeJoin(Paint.Join join) 拐角形状 MITER尖角、BEVEL平角、ROUND圆角
     4，setStrokeMiter(float miter) 是对strokeJoin的补充，延长线的最大值
-
+![](https://user-gold-cdn.xitu.io/2017/7/17/8a817db61864a298bdfbca27268c77f7?imageView2/0/w/1280/h/960/ignore-error/1)
+![](https://user-gold-cdn.xitu.io/2017/7/17/8fa8c7cfb47fa0f6d5d3c8c18635ae82?imageView2/0/w/1280/h/960/ignore-error/1)
+![](https://user-gold-cdn.xitu.io/2017/7/17/6a5f1de602276ce42cc5a7313a59fc08?imageView2/0/w/1280/h/960/ignore-error/1)
+![](https://user-gold-cdn.xitu.io/2017/7/17/36eeed61a7a0f1dc5b2d2db97e5b0557?imageView2/0/w/1280/h/960/ignore-error/1)
+![](https://user-gold-cdn.xitu.io/2017/7/17/a337179c3a87afcbf342256cb2e7f01f?imageView2/0/w/1280/h/960/ignore-error/1)
 ### 2.4 色彩优化
 	
-	paint.setDither(boolean) 
-	paint.setFilterBitmap(boolean)
-
-#####2.4.1 
+	作用：让图片看着更加顺眼
 	
+	paint.setDither(boolean)  图像的抖动
+	paint.setFilterBitmap(boolean)  双线性过滤
+![](https://user-gold-cdn.xitu.io/2017/7/17/efd7ea8e30164dc15492bac83dcd58bc?imageView2/0/w/1280/h/960/ignore-error/1)
+![](https://user-gold-cdn.xitu.io/2017/7/17/944479afd3ad2b8bff581ab0992173f4?imageView2/0/w/1280/h/960/ignore-error/1)
+
+#####2.5 setPathEffect(PathEffect)
+	
+	使用PathEffect来给图形的轮廓设置效果。对Canvas所有图形的绘制有效，也就是drawLine、drawCircle、drawPath这些方法。
+	6种PathEffect，分为两类：
+		单一效果类：
+			CornerPathEffect      拐角变成圆角
+			DiscretePathEffect    把线条进行随机的偏离，让轮廓变得乱七八糟，程度由方式和参数决定
+			DashPathEffect        
+			PathDashPathEffect
+		组合效果类：
+			SumPathEffect
+			ComposePathEffect
+	注意：
+		PathEffect有一些不支持硬件加速
+	
+	
+#####2.5.1.1  CornerPathEffect：
+		
+	new CornerPathEffect(20)
+![](https://user-gold-cdn.xitu.io/2017/7/17/4fcff0e4242359e80e05eb74e099dc2a?imageView2/0/w/1280/h/960/ignore-error/1)
+
+#####2.5.1.2  DiscretePathEffect：
+	
+	PathEffect pathEffect = new DiscretePathEffect(float segmentLength, float deviation);
+	segmentLength:用来拼接的每个线段的长度
+	deviation：偏移量
+![](https://user-gold-cdn.xitu.io/2017/7/17/d2fa819b64fe14dff09f679da3672eb4?imageView2/0/w/1280/h/960/ignore-error/1)
+
+#####2.5.1.3  DashPathEffect：
+
+	用虚线来绘制线条
+	PathEffect pathEffect = new DashPathEffect(new float[]{20, 10, 5, 10}, 0);
+	float[] intervals： 虚线的格式，数组元素至少2个，按照'画线长度-空白长度'来绘制
+	float phas  ： 虚线的偏移量
+![](https://user-gold-cdn.xitu.io/2017/7/17/23efecea4e7391ce791882e4452d5555?imageView2/0/w/1280/h/960/ignore-error/1)
+
+
+#####2.5.1.4  PathDashPathEffect  ：
+	
+	使用一个Path来绘制虚线
+	PathDashPathEffect(Path shape, float advance, float phase, PathDashPathEffect.Style style)
+	
+	Path shape：     用来绘制的path
+	float advance：  两个相邻的shape段之间的间隔
+	float phase：    虚线的偏移量
+	PathDashPathEffect.Style style  指定拐弯改变的时候shape的转换方式，有三种方式：
+		TRANSLATE：位移
+		ROTATE：旋转
+		MORPH ：变体
+
+![](https://user-gold-cdn.xitu.io/2017/7/17/3edcd8c5020b43350ead9123e70a78ac?imageView2/0/w/1280/h/960/ignore-error/1)
+![](https://user-gold-cdn.xitu.io/2017/7/17/bc7d0841e886282ed7c43622d28f6f24?imageView2/0/w/1280/h/960/ignore-error/1)
+
+#####2.5.1.5  SumPathEffect：组合效果类的PathEffect
+
+
+	很简单的行为，就是分别按照两种PathEffect分别对目标进行绘制
+
+![](https://user-gold-cdn.xitu.io/2017/7/17/bb1fb1c35ec6a453cf486241e631ba5f?imageView2/0/w/1280/h/960/ignore-error/1)
+
+#####2.5.1.6  ComposePathEffect 
+
+	先对目标path使用一个PathEffect，然后再对这个改变后的Path使用另外一个PathEffect。
+	PathEffect outerpe 先应用, PathEffect innerpe后应用
+
+![](https://user-gold-cdn.xitu.io/2017/7/17/92988c0ef11a0070e457b33ad78b854a?imageView2/0/w/1280/h/960/ignore-error/1)
+
+
+#####2.6 setShadowLayer(float radius,float dx,float dy,int shadowColor)  在之后绘制的内容下面加一层阴影。
+
+	清除阴影，使用paint.clearShadowLayer();
+	注意：
+		在硬件加速开启的情况下，setShadowLayer只支持文字的绘制，文字外的绘制必须关闭硬件加速。
+		如果shadowColor是半透明的，阴影的透明度就使用shadowColor自己的透明度，而如果shadowColor是不透明，阴影透明度就使用paint的透明度。
+
+
+#####2.7 setMaskFilter(MaskFilter)  在绘制层上方的附加效果。
+		
+	有两种：
+		BlurMaskFilter  模糊效果
+		EmbossMaskFilter  
+2.7.1 BlurMaskFilter 
+	
+	BlurMaskFilter(float radius, 
+	BlurMaskFilter.Blur style）
+	radius：模糊范围
+	style：
+		NORMAL:内外都模糊
+		SOLID:内部正常绘制，外部模糊
+		INNER：内部模糊，外部不绘制
+		OUTER：内部不绘制，外部模糊
+	
+![](https://user-gold-cdn.xitu.io/2017/7/17/666f2a37a1fdfb6895608e16b72fa6ec?imageView2/0/w/1280/h/960/ignore-error/1)
+
+2.7.2  EmbossMaskFilter 浮雕效果
+
+	EmbossMaskFilter(float[] direction, float ambient, float specular, float blurRadius)
+
+	direction:一个3个元素的数组，指定了光源的方向
+	ambient：环境光的强度，范围0-1
+	specuar：炫光的系数
+	blurRadius：应用光线的范围
+
+#####2.8 获取绘制的Path
+	根据paint的设置，计算出绘制Path或文字的实际Path
+2.8.1 getFillPath(Path src,Path dst)
+	
+	所谓实际Path：指的是drawPath的绘制内容的轮廓，要算算行线条宽度和设置的PathEffect。
+	
+![](https://user-gold-cdn.xitu.io/2017/7/17/e80d504826125eef2bd9976bf320e05d?imageView2/0/w/1280/h/960/ignore-error/1)
+
+	
+	通过getFillPath获取到这个实际Path，方法的参数，src是原path，dst就是实际path的保存位置。计算后，把结果保存到dst里。
+
+2.8.2 1,getTextPath(String text,int start,int end,float x,float y,Path path)   2,getTextPath(char[] text,int index,int count,float x,float y,Path path)
+![](https://user-gold-cdn.xitu.io/2017/7/17/be85350bd7bea835bb02f73e0c6fd9f6?imageView2/0/w/1280/h/960/ignore-error/1)
+如下图，可以用做图形和文字的装饰效果的位置计算，比如自定义的下划线效果
+![](https://user-gold-cdn.xitu.io/2017/7/17/a9a6dd9c3d140da7cbc6d7b713696830?imageView2/0/w/1280/h/960/ignore-error/1)
+
+
+## 3，drawText（）相关
+	
+	Paint有些设置是文字绘制相关的，即和drawText()相关的
+
+比如设置文字大小：
+![](https://user-gold-cdn.xitu.io/2017/7/17/8d7981e94d43841ec6c6b97b840927c2?imageView2/0/w/1280/h/960/ignore-error/1)
+比如设置文字间隔：
+![](https://user-gold-cdn.xitu.io/2017/7/17/6e30f7a5328f542e7b351ac5f611393b?imageView2/0/w/1280/h/960/ignore-error/1)
+比如设置各种文字效果：
+![](https://user-gold-cdn.xitu.io/2017/7/17/dbdd0a0239a8251dba0910af45965a2d?imageView2/0/w/1280/h/960/ignore-error/1)
+
+## 4，初始化类
+### 4.1  reset()重置Paint的所有属性为默认值，相当于重新new一个，不过性能当然高一些。
+### 4.2  set（Paint src）把src的所有属性全部赋值过来。
+### 4.3  setFlags（int flags）  鼻梁设置flags，相当于依次调用它们的set方法。
+	
+	paint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
 
